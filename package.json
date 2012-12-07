@@ -1,0 +1,14 @@
+{
+  "name": "rdata-consumer-node",
+  "version": "0.0.1",
+  "private": "true",
+  "dependencies": {
+    "express": "*",
+    "jade": "*",
+    "stylus": "*",
+    "nib": "*",
+    "amqp":"*",
+    "node-uuid":"*",
+    "winston":"*"
+  }
+}

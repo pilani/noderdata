@@ -1,0 +1,95 @@
+var fs = require('fs');
+var cfg = require('../config.js');
+var exec = require('child_process').exec;
+
+/**
+Scan all the files that rolled out from the consumer. Upload the csv file to bigquery and move the csv and s3 file to 
+gsuploaded folder
+*/
+
+function gsupload(){
+// scan and get all s3 and .csv files
+logger(" base path "+cfg.config["BASE_DATA_PATH"]);
+fs.readdir(cfg.config["BASE_DATA_PATH"],function(err,files){
+     logger("reading file list in the base data dir");
+     for(var i in files){
+       logger("file "+files[i]);
+        if(files[i].indexOf("csv.20")==-1){//looks ugly but works in this millenium
+          continue;
+        }
+        var gsfile = files[i].toString();
+        var s3file = files[i].toString().replace("csv","s3");
+         logger(" gsfile :"+gsfile+" s3file:"+s3file);
+        //call gsupload 
+          logger("gs command : "+"gsutil cp "+cfg.config["BASE_DATA_PATH"]+gsfile+" gs://"+cfg.config["BASE_GSSTORAGE_BUCKET"]);
+          exec("gsutil cp "+cfg.config["BASE_DATA_PATH"]+gsfile+" gs://"+cfg.config["BASE_GSSTORAGE_BUCKET"],function(error,stdout,stderr){
+		if(error){
+		 logger(stderr)
+		 }
+                else{
+                         //move files to gsuploaded folder
+                        logger("cmd: "+" mv "+cfg.config["BASE_DATA_PATH"]+gsfile+" "+cfg.config["BASE_DATA_PATH"]+s3file+" "+cfg.config["GSUPLOADED_DATA_PATH"]);
+                        exec("mv "+cfg.config["BASE_DATA_PATH"]+gsfile+" "+cfg.config["BASE_DATA_PATH"]+s3file+" "+cfg.config["GSUPLOADED_DATA_PATH"],
+                              function(error,stdout,stderr){if(error){logger(stderr);}});
+                    }
+             });
+
+     }
+});
+
+}
+
+
+function bqimport(){
+// scan all gsuploaded files
+
+fs.readdir(cfg.config["GSUPLOADED_DATA_PATH"],function(err,files){
+     for(var i in files){
+         logger("current file "+files[i]);
+         if(files[i].indexOf("csv.20")==-1){
+            continue;
+         }
+         var gsfile = files[i].toString();
+         var s3file = files[i].toString().replace("csv","s3");
+
+        var qname= files[i].split(".")[0];//hardcoded for now
+	var jobid=gsfile.replace(/\./g,"-");
+          //using filename as the job id to prevent duplicate imports into bigquery
+          logger("bq  --nosync load --job_id  "+jobid+" "+cfg.config[qname+"_TABLE"]+"  gs://"+cfg.config["BASE_GSSTORAGE_BUCKET"]+gsfile);
+          exec("bq  --nosync load --job_id  "+jobid+" "+cfg.config[qname+"_TABLE"]+"  gs://"+cfg.config["BASE_GSSTORAGE_BUCKET"]+gsfile,function(error,stdout,stderr){
+				 logger(stdout+" "+error+" "+stderr);		
+		if(error){
+		 logger(stderr);
+		 logger(stdout+" "+error);
+                          //we should move them to failed folders
+	          logger("mv "+cfg.config["GSUPLOADED_DATA_PATH"]+gsfile+" "+cfg.config["GSUPLOADED_DATA_PATH"]+s3file+" "+cfg.config["BQFAILED_DATA_PATH"]);
+                  exec("mv "+cfg.config["GSUPLOADED_DATA_PATH"]+gsfile+" "+cfg.config["GSUPLOADED_DATA_PATH"]+s3file+" "+cfg.config["BQFAILED_DATA_PATH"],
+                              function(error,stdout,stderr){
+				if(error){
+                                 logger(stderr);
+				}
+                                
+                             });
+		 }
+                else{
+       			 logger("mv "+cfg.config["GSUPLOADED_DATA_PATH"]+gsfile+" "+cfg.config["GSUPLOADED_DATA_PATH"]+s3file+" "+cfg.config["BQIMPORTED_DATA_PATH"]);
+                          exec("mv "+cfg.config["GSUPLOADED_DATA_PATH"]+gsfile+" "+cfg.config["GSUPLOADED_DATA_PATH"]+s3file+" "+cfg.config["BQIMPORTED_DATA_PATH"],
+                              function(error,stdout,standerr){
+				if(error){
+                                 logger(stderr+" "+stdout+" "+error);
+				}
+                                  else{
+                                         // eventually we'll need to upload s3file to s3 and .csv file should be deleted
+					}
+                             });
+                    }
+             });
+
+     
+
+ }
+});
+}
+function logger(mess){
+console.log(mess);
+}
