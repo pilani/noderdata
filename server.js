@@ -13,6 +13,7 @@ var rbmqhost=cfg.config['RABBIT-HOST'];
 var queues =cfg.config['QS'];
 var logger = require('./logger.js').logger;
 var filesuploader = require('./filesuploader/filesuploader.js');
+var nomesslog = require('./logger.js').logger.loggers.get('nomess');
 
 
 var http = require("http");
@@ -47,7 +48,7 @@ amqp.createConnection({host:rbmqhost}).on('ready',function(){connection.queue("L
 var qs = [];
 var conOnReady= function () {
   connOn=true;
-  logger.info("connection ready");
+  nomesslog.info("connection ready");
   for(var i=0;i<queues.length;i++){
     q = connection.queue(queues[i],{autoDelete:false,closeChannelOnUnsubscribe: true}, qOnReady);
     qs[i]=q;
@@ -56,15 +57,15 @@ var conOnReady= function () {
 
 var connection = null;
 function launch(){
-logger.info("starting up");
+nomesslog.info("starting up");
 
 connection = amqp.createConnection({ host: rbmqhost },{reconnect:false});
-logger.info("created connection ");
+nomesslog.info("created connection ");
 connection.on('ready',conOnReady);
 
 
 connection.on('close',function(){ 
-logger.info('connection close called ');
+nomesslog.info('connection close called ');
 connOn=false;
  /*for(var i =0;i<qs.length;i++){
   logger.info("going to unsubscribe "+qs[i].name);
@@ -79,7 +80,7 @@ connOn=false;
 });
 
 connection.on('error',function(err){
-logger.info("connection errored out ");
+nomesslog.info("connection errored out ");
 logger.error(err);
  setTimeout(launch(),5000);
 });
@@ -97,7 +98,7 @@ logger.error(err);
 
 function qOnReady(q){
  // Catch all messages
-  logger.info("Q "+q.name+" is ready");
+  nomesslog.info("Q "+q.name+" is ready");
   q.bind('#');
  // Receive messages
   q.subscribe({cosumerTag:q.name},subscriber);
@@ -156,22 +157,22 @@ if(err) throw err;
 
 
 process.on( 'SIGINT', function() {
-  logger.info( "\n trying to gracefully shut down from  SIGINT (Crtl-C)" );
+  nomesslog.info( "\n trying to gracefully shut down from  SIGINT (Crtl-C)" );
 if(filesuploader.canWeShutdown()){
-  logger.info("no active bq importer is running");
-  logger.info("Attemting connection shutdown");
+  nomesslog.info("no active bq importer is running");
+  nomesslog.info("Attemting connection shutdown");
   connection.end();
 
 
 	if(fs.allWritesDrained() && !connOn){
-	logger.info("Actually exiting "); 
+	nomesslog.info("Actually exiting "); 
 	sleep(3000);
 	process.exit();
 	}else{
-	logger.info("Files are still being written we will wait or connection end is still not called");
+	nomesslog.info("Files are still being written we will wait or connection end is still not called");
 	}
 
-}else{ logger.info("bq importer is still running , we will tell to schedule no further "); filesuploader.shutdown()};
+}else{ nomesslog.info("bq importer is still running , we will tell to schedule no further "); filesuploader.shutdown()};
 });
 
 launch();
