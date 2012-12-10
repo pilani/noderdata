@@ -10,7 +10,14 @@ winston.loggers.add('bqimport', {
       filename: 'bqimport.log',maxsize:(1024*1000*10),maxFiles:20
     }
   });
-
+winston.loggers.add('nomess', {
+    console: {
+     
+    },
+    file: {
+      filename: 'nomess.log',maxsize:(1024*1000*10),maxFiles:20
+    }
+  });
 
 
 
