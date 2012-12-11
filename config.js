@@ -4,7 +4,7 @@ map["FILE_ROLLOVER_TIME"]=5*60*1000;
 map["BASE_DATA_PATH"]="/home/pradeep/.rdata/rfiles/";
 map["SRV_FILE_PREFIX"]="1";// should be read outside the server
 map["BASE_GSSTORAGE_BUCKET"]="rb-test-bucket/";
-map["MIS_TABLE"]="rbdata.prodtabledummy";
+map["TABLE"]="rbdata.prodtabledummy";
 map["GSUPLOADED_DATA_PATH"]=map["BASE_DATA_PATH"]+"gsuploaded/";
 map["BQFAILED_DATA_PATH"]=map["BASE_DATA_PATH"]+"bqfailed/";
 map["BQIMPORTED_DATA_PATH"]=map["BASE_DATA_PATH"]+"bqimported/";
@@ -19,4 +19,9 @@ return map["BASE_DATA_PATH"]+qname+"."+map["SRV_FILE_PREFIX"]+".csv";
 
 exports.getBucketName = function getBucketName(qname){
 return map["BASE_GSSTORAGE_BUCKET"];
+}
+
+
+exports.getTableName = function getTableName(qname){
+return map["TABLE"];
 }
