@@ -14,6 +14,7 @@ var queues =cfg.config['QS'];
 var logger = require('./logger.js').logger;
 var filesuploader = require('./filesuploader/filesuploader.js');
 var nomesslog = require('./logger.js').logger.loggers.get('nomess');
+var messerror = require('./logger.js').logger.loggers.get('messerror');
 
 
 var http = require("http");
@@ -45,6 +46,7 @@ amqp.createConnection({host:rbmqhost}).on('ready',function(){connection.queue("L
 
 
 // Wait for connection to become established.
+var connOn=false;
 var qs = [];
 var conOnReady= function () {
   connOn=true;
@@ -116,13 +118,13 @@ var msg = message.data.toString();
 //apply transformation 
 var bqfilepath=cfg.getFileName(deliveryinfo.queue);
 //var s3filepath=cfg.config["BASE_DATA_PATH"]+deliveryinfo.queue+".map";
-//try{
+try{
       var val = bqutil.formBqCompliantLine(bqutil.formMapFromString(msg,keys.keys),columns.columns,ckmap.ckmap,ctypes)
       logger.info(val);
 
-//}catch(err){
-//logger(err);// TODO fixing log
-//}
+}catch(err){
+  messerror.error(err);
+}
 
 fs.appendToFile(bqfilepath,val+"\n",errHandler);
 //fs.appendToFile(s3filepath,msg+"\n",errHandler); // I dont think we need s3 file , we can transform from csv anyway
