@@ -61,15 +61,16 @@ fs.readdir(cfg.config["BASE_DATA_PATH"],function(err,files){
           logger.info("gs command : "+gscmd);
           exec(gscmd,function(error,stdout,stderr){
 		if(error){
-		 logger.error(stderr)
+		 logger.error("error in gs copy "+stderr+stdout)
                  gsuploadRunning--;
 		 }
                 else{
                          //move files to gsuploaded folder
+                         logger.info("gs upload succeded"+gscmd);
                         var cmd = "mv "+cfg.config["BASE_DATA_PATH"]+gsfile+" "+cfg.config["GSUPLOADED_DATA_PATH"];
                         logger.info(cmd);
                         exec(cmd,
-                              function(error,stdout,stderr){gsuploadRunning--;if(error){logger.error(stderr);}});
+                              function(error,stdout,stderr){gsuploadRunning--;if(error){logger.error("error in moving gsuploaded file "+stderr+stdout);}});
                     }
                 
              });
@@ -99,13 +100,13 @@ fs.readdir(cfg.config["GSUPLOADED_DATA_PATH"],function(err,files){
         var qname= gsfile.split(".")[0];//hardcoded for now
 	var jobid=gsfile.replace(/\./g,"-");
           //using filename as the job id to prevent duplicate imports into bigquery
-	  var bqcmd ="bq  load --job_id  "+jobid+" "+cfg.config[qname+"_TABLE"]+"  gs://"+cfg.getBucketName(qname)+gsfile; 
+	  var bqcmd ="bq  load --job_id  "+jobid+" "+cfg.getTableName(qname)+"  gs://"+cfg.getBucketName(qname)+gsfile; 
           logger.info(bqcmd);
           exec(bqcmd,function(error,stdout,stderr){
 		
 		if(error){
-		 logger.error(stderr);
-		 logger.error(stdout+" "+error);
+		 logger.error("error in bq load"+ stderr);
+		 logger.error("error in bq load "+stdout+" "+error);
                           //we should move them to failed folders
 		  var fcmd = "mv "+cfg.config["GSUPLOADED_DATA_PATH"]+gsfile+" "+ cfg.config["BQFAILED_DATA_PATH"];
 	          logger.info(fcmd);
@@ -113,19 +114,21 @@ fs.readdir(cfg.config["GSUPLOADED_DATA_PATH"],function(err,files){
                               function(error,stdout,stderr){
 				bqImportrunning--;
 				if(error){
-                                 logger.error(stderr);
+                                 logger.error("error in moving gs to bq failed "+stderr+stdout);
 				}
+                             
                                 
                              });
 		 }
                 else{
+                logger.info("bq load succeded");
 		var scmd = "mv "+cfg.config["GSUPLOADED_DATA_PATH"]+gsfile+" "+cfg.config["BQIMPORTED_DATA_PATH"];
        			 logger.info(scmd);
                           exec(scmd,
                               function(error,stdout,standerr){
                                  bqImportrunning--;
 				if(error){
-                                 logger.error(stderr+" "+stdout+" "+error);
+                                 logger.error("err in moving gscopy to bqimported "+stderr+" "+stdout+" "+error);
 				}
                                   else{
                                          // eventually we'll need to upload s3file to s3 and .csv file should be deleted
