@@ -55,7 +55,7 @@ fs.readdir(cfg.config["BASE_DATA_PATH"],function(err,files){
         }
 	gsuploadRunning++;
         var gsfile = files[i].toString();
-
+        var qname= gsfile.split(".")[0];//hardcoded for now
         //call gsupload 
 	var gscmd = "gsutil cp "+cfg.config["BASE_DATA_PATH"]+gsfile+" gs://"+cfg.getBucketName(qname);
           logger.info("gs command : "+gscmd);
@@ -96,7 +96,7 @@ fs.readdir(cfg.config["GSUPLOADED_DATA_PATH"],function(err,files){
          var gsfile = files[i].toString();
          
 
-        var qname= files[i].split(".")[0];//hardcoded for now
+        var qname= gsfile.split(".")[0];//hardcoded for now
 	var jobid=gsfile.replace(/\./g,"-");
           //using filename as the job id to prevent duplicate imports into bigquery
 	  var bqcmd ="bq  load --job_id  "+jobid+" "+cfg.config[qname+"_TABLE"]+"  gs://"+cfg.getBucketName(qname)+gsfile; 
