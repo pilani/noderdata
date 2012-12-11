@@ -156,9 +156,7 @@ if(err) throw err;
   }
 
   
-
-
-process.on( 'SIGINT', function() {
+function shutdown(){
   nomesslog.info( "\n trying to gracefully shut down from  SIGINT (Crtl-C)" );
 if(filesuploader.canWeShutdown()){
   nomesslog.info("no active bq importer is running");
@@ -175,7 +173,17 @@ if(filesuploader.canWeShutdown()){
 	}
 
 }else{ nomesslog.info("bq importer is still running , we will tell to schedule no further "); filesuploader.shutdown()};
-});
+}
+
+
+
+
+process.on( 'SIGINT', shutdown);
+
+process.on('uncaughtException', function (exception) {
+   shutdown();
+    throw exception;
+  });
 
 launch();
 filesuploader.startup();

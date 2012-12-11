@@ -4,25 +4,19 @@ winston.add(winston.transports.File, { filename: bdp+'rdata.log',maxsize:(1024*1
 //winston.add(winston.transports.Console);
 //winston.add(winston.transports.File, { filename: 'error.log' ,level:'error',maxsize:(1024*1000*10),maxFiles:20});
 winston.loggers.add('bqimport', {
-    console: {
-     
-    },
+   
     file: {
       filename: bdp+'bqimport.log',maxsize:(1024*1000*10),maxFiles:20
     }
   });
 winston.loggers.add('nomess', {
-    console: {
-     
-    },
+   
     file: {
       filename: bdp+'nomess.log',maxsize:(1024*1000*10),maxFiles:20
     }
   });
 winston.loggers.add('messerror', {
-    console: {
-     
-    },
+   
     file: {
       filename: bdp+'messerror.log',maxsize:(1024*1000*10),maxFiles:20
     }

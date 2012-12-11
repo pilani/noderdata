@@ -110,7 +110,7 @@ fs.readdir(cfg.config["GSUPLOADED_DATA_PATH"],function(err,files){
                           //we should move them to failed folders
 		  var fcmd = "mv "+cfg.config["GSUPLOADED_DATA_PATH"]+gsfile+" "+ cfg.config["BQFAILED_DATA_PATH"];
 	          logger.info(fcmd);
-                  exec(cmd,
+                  exec(fcmd,
                               function(error,stdout,stderr){
 				bqImportrunning--;
 				if(error){
