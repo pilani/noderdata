@@ -13,7 +13,7 @@ var rbmqhost=cfg.config['RABBIT-HOST'];
 var queues =cfg.config['QS'];
 var logger = require('./logger.js').logger;
 var filesuploader = require('./filesuploader/filesuploader.js');
-var nomesslog = require('./logger.js').logger.loggers.get('nomess');
+var messlog = require('./logger.js').logger.loggers.get('mess');
 var messerror = require('./logger.js').logger.loggers.get('messerror');
 
 
@@ -50,7 +50,7 @@ var connOn=false;
 var qs = [];
 var conOnReady= function () {
   connOn=true;
-  nomesslog.info("connection ready");
+  logger.info("connection ready");
   for(var i=0;i<queues.length;i++){
     q = connection.queue(queues[i],{autoDelete:false,closeChannelOnUnsubscribe: true}, qOnReady);
     qs[i]=q;
@@ -59,15 +59,15 @@ var conOnReady= function () {
 
 var connection = null;
 function launch(){
-nomesslog.info("starting up");
+loggerm("starting up");
 
 connection = amqp.createConnection({ host: rbmqhost },{reconnect:false});
-nomesslog.info("created connection ");
+logger.info("created connection ");
 connection.on('ready',conOnReady);
 
 
 connection.on('close',function(){ 
-nomesslog.info('connection close called ');
+logger.info('connection close called ');
 connOn=false;
  /*for(var i =0;i<qs.length;i++){
   logger.info("going to unsubscribe "+qs[i].name);
@@ -82,7 +82,7 @@ connOn=false;
 });
 
 connection.on('error',function(err){
-nomesslog.info("connection errored out ");
+logger.info("connection errored out ");
 logger.error(err);
  setTimeout(launch(),5000);
 });
@@ -91,16 +91,9 @@ logger.error(err);
 
 }
 
-
-
-//connection.on('end',function(){ logger.info('connection end called')});
-
-
-
-
 function qOnReady(q){
  // Catch all messages
-  nomesslog.info("Q "+q.name+" is ready");
+  logger.info("Q "+q.name+" is ready");
   q.bind('#');
  // Receive messages
   q.subscribe({cosumerTag:q.name},subscriber);
@@ -119,11 +112,11 @@ var msg = message.data.toString();
 var bqfilepath=cfg.getFileName(deliveryinfo.queue);
 //var s3filepath=cfg.config["BASE_DATA_PATH"]+deliveryinfo.queue+".map";
 try{
-      var val = bqutil.formBqCompliantLine(bqutil.formMapFromString(msg,keys.keys),columns.columns,ckmap.ckmap,ctypes)
-      logger.info(val);
+     var val = bqutil.formBqCompliantLine(bqutil.formMapFromString(msg,keys.keys),columns.columns,ckmap.ckmap,ctypes)
+      messlog.info(val);
 
 }catch(err){
-  messerror.error(err);
+  messerror.error("error in parsing "+err.stack);
 }
 
 fs.appendToFile(bqfilepath,val+"\n",errHandler);
@@ -138,7 +131,7 @@ fs.appendToFile(bqfilepath,val+"\n",errHandler);
         //fs.rollOverTheFileSync(s3filepath,timestamp);
 	fp.setFileStartTime(deliveryinfo.queue,Date.now());
 	}
-logger.info((Date.now()-tim)+" "+count);
+//messlog.info((Date.now()-tim)+" "+count);
 
 }
 
@@ -155,24 +148,28 @@ if(err) throw err;
     while (new Date().getTime() < startTime + milliSeconds);
   }
 
-  
+function loggerm(mess){// because during shutdown winston would still be buffering so we will use console.log
+logger.info(mess);
+console.log(mess);
+} 
+
 function shutdown(){
-  nomesslog.info( "\n trying to gracefully shut down from  SIGINT (Crtl-C)" );
-if(filesuploader.canWeShutdown()){
-  nomesslog.info("no active bq importer is running");
-  nomesslog.info("Attemting connection shutdown");
+  loggerm( "\n trying to gracefully shut down from  SIGINT (Crtl-C)" );
+  loggerm("Calling  connection end");
   connection.end();
-
-
+if(filesuploader.canWeShutdown()){
+loggerm("no active bq importer is running");
+   loggerm("no active bq importer is running");
 	if(fs.allWritesDrained() && !connOn){
-	nomesslog.info("Actually exiting "); 
+	loggerm("Actually exiting "); 
+
 	sleep(3000);
 	process.exit();
 	}else{
-	nomesslog.info("Files are still being written we will wait or connection end is still not called");
+	loggerm("Files are still being written we will wait or connection end is still not called");
 	}
 
-}else{ nomesslog.info("bq importer is still running , we will tell to schedule no further "); filesuploader.shutdown()};
+}else{ loggerm("bq importer is still running , we will tell to schedule no further "); filesuploader.shutdown()};
 }
 
 
