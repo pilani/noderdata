@@ -21,6 +21,7 @@ fs.renameSync(path,path+"."+timestamptoappend);
 
 exports.allWritesDrained= function allWritesDrained(){
 	logger.info("open calls left "+opencalls);
+	console.log("open calls left "+opencalls);
   if(opencalls==0){
     return true;
   }

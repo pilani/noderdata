@@ -1,2 +1,8 @@
 
 var gsfile = "MIS.1.csv";
+
+timestamp":"2012-12-13T05:51:50.710Z"}
+{"level":"info","message":"created connection ","timestamp":"2012-12-13T05:51:50.717Z"}
+{"level":"info","message":"connection ready","timestamp":"2012-12-13T05:51:50.764Z"}
+{"level":"info","message":"Q BOSS is ready","timestamp":"2012-12-13T05:51:50.766Z"}
+

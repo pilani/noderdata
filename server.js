@@ -114,12 +114,12 @@ var bqfilepath=cfg.getFileName(deliveryinfo.queue);
 try{
      var val = bqutil.formBqCompliantLine(bqutil.formMapFromString(msg,keys.keys),columns.columns,ckmap.ckmap,ctypes)
       messlog.info(val);
-
+     fs.appendToFile(bqfilepath,val+"\n",errHandler);
 }catch(err){
   messerror.error("error in parsing "+err.stack);
 }
 
-fs.appendToFile(bqfilepath,val+"\n",errHandler);
+
 //fs.appendToFile(s3filepath,msg+"\n",errHandler); // I dont think we need s3 file , we can transform from csv anyway
 //and generate s3 and bigquery csv
 //if we should rollover wait for all filewrites to end then rollover --for now we are blindly rolling over
