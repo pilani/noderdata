@@ -8,7 +8,7 @@ map["BASE_TABLE"]="rbdata.prodtabledummy";
 map["GSUPLOADED_DATA_PATH"]=map["BASE_DATA_PATH"]+"gsuploaded/";
 map["BQFAILED_DATA_PATH"]=map["BASE_DATA_PATH"]+"bqfailed/";
 map["BQIMPORTED_DATA_PATH"]=map["BASE_DATA_PATH"]+"bqimported/";
-map["RABBIT-HOST"]="rdata.pilanisoftlabs.com";
+map["RABBIT-HOST"]="10.120.10.33";
 //map["RABBIT-HOST"]="localhost";
 map["QS"]=["BOSS"];
 
