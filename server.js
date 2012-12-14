@@ -5,6 +5,7 @@ var columns = require('./columns.js');
 var ckmap = require('./columnkeymapping.js');
 var fs = require('./fsutil.js');
 var du=require('./dateutil.js');
+//start(3000,'127.0.0.1');
 var fp= require('./fileproperties.js');
 var cfg =require('./config.js');	
 var ctypes = require('./columnstype.js').ctype;
@@ -15,7 +16,7 @@ var logger = require('./logger.js').logger;
 var filesuploader = require('./filesuploader/filesuploader.js');
 var messlog = require('./logger.js').logger.loggers.get('mess');
 var messerror = require('./logger.js').logger.loggers.get('messerror');
-
+var httpport = cfg.config['HTTP-PORT'];
 
 var http = require("http");
 
@@ -23,7 +24,7 @@ http.createServer(function(request, response) {
   response.writeHead(200, {"Content-Type": "text/plain"});
   response.write("Hello World");
   response.end();
-}).listen(8888);
+}).listen(httpport);
 
 
 
