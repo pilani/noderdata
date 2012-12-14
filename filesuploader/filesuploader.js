@@ -100,7 +100,7 @@ fs.readdir(cfg.config["GSUPLOADED_DATA_PATH"],function(err,files){
         var qname= gsfile.split(".")[0];//hardcoded for now
 	var jobid=gsfile.replace(/\./g,"-");
           //using filename as the job id to prevent duplicate imports into bigquery
-	  var bqcmd ="bq  load --job_id  "+jobid+" "+cfg.getTableName(qname)+"  gs://"+cfg.getBucketName(qname)+gsfile; 
+	  var bqcmd ="bq  load --allow_quoted_newlines --job_id  "+jobid+" "+cfg.getTableName(qname)+"  gs://"+cfg.getBucketName(qname)+gsfile; 
           logger.info(bqcmd);
           exec(bqcmd,function(error,stdout,stderr){
 		
