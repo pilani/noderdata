@@ -17,17 +17,54 @@ var filesuploader = require('./filesuploader/filesuploader.js');
 var messlog = require('./logger.js').logger.loggers.get('mess');
 var messerror = require('./logger.js').logger.loggers.get('messerror');
 var httpport = cfg.config['HTTP-PORT'];
+//var http = require('http');
+var express = require('express'),
+   routes = require('./routes')
+  , stylus = require('stylus');
 
-var http = require("http");
-
-http.createServer(function(request, response) {
+/*http.createServer(function(request, response) {
   response.writeHead(200, {"Content-Type": "text/plain"});
   response.write("Hello World");
   response.end();
-}).listen(httpport);
+}).listen(httpport);*/
+
+obj = require('./bqImportsHealthCheck/bqjobstatus'); 
+pendingFilesObj = require('./bqImportsHealthCheck/bqPendingFiles.js'); 
+failedFilesObj = require('./bqImportsHealthCheck/bqFailedFiles.js');
+
+var app = express();
+
+app.configure(function(){
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'jade');
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
+  app.use(app.router);
+  
+  app.use(stylus.middleware(
+		  {
+			src: __dirname + '/views',
+	  		dest: __dirname + '/public'
+		  }));  
+
+  app.use(express.static(__dirname + '/public'));
+});
 
 
+// Routes
+app.get('/', function (req, res) {
+  res.render('index',
+  { title : 'index' , body: '...'}
+  )
+})
+app.get('/bqhome', routes.bqhome);
+app.get('/impff', routes.impff);
+app.get('/rmqhcs', routes.rmqhcs);
+app.get('/bqPendingFiles', pendingFilesObj.bqGetListOfPendingFiles);
+app.get('/bqFailedFiles', failedFilesObj.bqGetListOfFailedFiles);
+app.get('/bqImportsHealthCheckService', obj.bqImportsHealthCheckService);
 
+app.listen(httpport);
 
 /* for(var i=0;i<queues.length;i++){
   logger("trying to create new connection for "+"q: "+queues[i]);
@@ -79,7 +116,7 @@ connOn=false;
 	});
  }*/
 
-
+filesuploader.startup();
 });
 
 connection.on('error',function(err){
@@ -184,7 +221,7 @@ process.on('uncaughtException', function (exception) {
   });
 
 launch();
-filesuploader.startup();
+
 //TODO 1. graceful exit test 2. Log file rotation and config 3.File rotation to be synchronized 4. proper config 5 .fs operations to be flushed before shutdown
 //TODO seperate buckets for different teams
 
