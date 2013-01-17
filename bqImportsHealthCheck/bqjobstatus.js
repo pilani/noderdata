@@ -66,7 +66,7 @@ function checkJobStatus(jobId,jobType,jobStatus,lastRunTime)
 {
       if(jobStatus == 'SUCCESS')
       {
-        // console.log(" job  : "+jobType+" Job Status :"+jobStatus+" lastRunTime :"+lastRunTime+" job Id :"+columns[0]);
+        logger.info(" job  : "+jobType+" Job Status :"+jobStatus+" lastRunTime :"+lastRunTime+" job Id :"+jobId);
      
         var tmh = lastRunTime.split(':');
         var today = new Date();
