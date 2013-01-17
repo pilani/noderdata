@@ -1,7 +1,7 @@
-/*exports.bqimportsstatus = function(req, res) {
+exports.bqimportsstatus = function(req, res) {
 res.send();
 }; 
-*/
+
 var exec = require('child_process').exec;
 
 //var bqcmd ="bq  ls -j --max_results=50"; 
@@ -87,7 +87,7 @@ function prepareColumnValuesWithDelimter(rowline)
       if(rowValue!='')
 	  rowValue+='#';
 
-	rowValue+=a[i];
+	rowValue+=a[i];																																																																																																																																																																		
 		       
        //console.log("column value  counter : "+i +" value : "+ a[i]);	
    }	

@@ -1,9 +1,10 @@
-//var logger = require('../logger.js').logger;
+var logger = require('../logger.js').logger;
+var cfg =require('../config.js');
 var exec = require('child_process').exec;
 
-var dir = "/home/bhaskar/.rdata/rfiles1";
-var bqcmd ="ls -cr "+dir+"/ | grep \".csv.20\"";  
-console.log("cmd :"+bqcmd);
+var dir = cfg.config["BASE_DATA_PATH"];
+var bqcmd ="ls -cr "+dir+"| grep \".csv.20\"";  
+//console.log("cmd :"+bqcmd);
 exports.bqGetListOfPendingFiles = function(req, res) {
 bqGetListOfPendingFiles(function (response) {
 res.send(response);
@@ -19,7 +20,7 @@ function bqGetListOfPendingFiles(callback)
 {
   
 executeCommand(bqcmd, function (cmdResult) {
-      console.log(" cmdResult : "+cmdResult);
+     logger.info(" Pending Files CmdResult : "+cmdResult);
        
        if(cmdResult=='Error!')
        {
@@ -37,7 +38,7 @@ executeCommand(bqcmd, function (cmdResult) {
            {
 		if(files[l].length >1)
 		{
-                   console.log(files[l]);
+                  // console.log(files[l]);
 		   
 		  filesArray[counter] = new fileInfo(files[l]);
  		  counter++;
@@ -56,7 +57,7 @@ function executeCommand(cmd, callback)
    {
         if(error)
 	{	   
-	    console.log("BQ Pending Files Error communicating......."+stderr);
+	    logger.info("BQ Pending Files Error communicating......."+stderr);
 	    callback("Error!");
         }
 	else

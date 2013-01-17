@@ -1,9 +1,10 @@
-//var logger = require('../logger.js').logger;
+var logger = require('../logger.js').logger;
+var cfg =require('../config.js');
 var exec = require('child_process').exec;
 
-var dir = "/home/bhaskar/.rdata/rfiles1/bqfailed";
-var bqcmd ="ls -cr "+dir+"/ | grep \".csv.20\"";  
-
+var dir = cfg.config["BASE_DATA_PATH"];
+var bqcmd ="ls -cr "+dir+"bqfailed/ | grep \".csv.20\"";  
+//console.log(bqcmd);
 exports.bqGetListOfFailedFiles = function(req, res) {
 bqGetListOfFailedFiles(function (response) {
 res.send(response);
@@ -19,7 +20,7 @@ function bqGetListOfFailedFiles(callback)
 {
   
 executeCommand(bqcmd, function (cmdResult) {
-      console.log(" cmdResult : "+cmdResult);
+       logger.info(" BQ FailedFiles cmdResult : "+cmdResult);
        
        if(cmdResult=='Error!')
        {
@@ -37,7 +38,7 @@ executeCommand(bqcmd, function (cmdResult) {
            {
 		if(files[l].length >1)
 		{
-                   console.log(files[l]);
+                  // console.log(files[l]);
 		   
 		  filesArray[counter] = new fileInfo(files[l]);
  		  counter++;
@@ -56,7 +57,7 @@ function executeCommand(cmd, callback)
    {
         if(error)
 	{	   
-	    console.log("BQ Failed Files Error communicating......."+stderr);
+	    logger.info("BQ Failed Files Error communicating......."+stderr);
 	    callback("Error!");
         }
 	else
