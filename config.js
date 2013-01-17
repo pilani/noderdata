@@ -1,7 +1,7 @@
 var map = new Object();
 map["MIS"]="MIS"; 
 map["FILE_ROLLOVER_TIME"]=5*60*1000;	 	
-map["BASE_DATA_PATH"]="/home/pradeep/.rdata/rfiles1/";
+map["BASE_DATA_PATH"]="/home/bhaskar/.rdata/rfiles1/";
 map["SRV_FILE_PREFIX"]="1";// should be read outside the server
 map["BASE_GSSTORAGE_BUCKET"]="rb-test-bucket/";
 map["BASE_TABLE"]="rbdata.prodtabledummy";
@@ -10,6 +10,7 @@ map["BQFAILED_DATA_PATH"]=map["BASE_DATA_PATH"]+"bqfailed/";
 map["BQIMPORTED_DATA_PATH"]=map["BASE_DATA_PATH"]+"bqimported/";
 map["RABBIT-HOST"]="10.120.10.33";
 map["HTTP-PORT"]="8080";
+map["BQ_IMPORT_DELAY_TIME"]= 10;	 
 //map["RABBIT-HOST"]="localhost";
 map["QS"]=["BOSS"];
 
