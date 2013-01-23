@@ -7,10 +7,10 @@ var enableBqImport = true;
 exports.shutdown= function (){enableBqImport=false};
 
 exports.startup = function startup(){
+  //console.log(" gsuploadRunning "+gsuploadRunning +" bqImportrunning "+bqImportrunning);  
 setTimeout(gsuploadRunner(),1000*60);
 setTimeout(bqImportRunner(),1000*60);
 }
-
 
 var gsuploadRunning=0;
 var bqImportrunning=0;
@@ -44,33 +44,42 @@ gsuploaded folder
 */
 function gsupload(){
 // scan and get all s3 and .csv files
+//console.log("calling ....gsupload...")
 gsuploadRunning++;
 logger.info("calling gs upload scanning base path "+cfg.config["BASE_DATA_PATH"]);
 fs.readdir(cfg.config["BASE_DATA_PATH"],function(err,files){
-
+//console.log("11111111111111111");
      for(var i in files){
-
+//console.log("222222222222222222222" +files[i]);
         if(files[i].indexOf("csv.20")==-1){//looks ugly but works in this millenium
           continue;
         }
 	gsuploadRunning++;
-        var gsfile = files[i].toString();
+        var gsfile = files[i].toString();console.log("gsfile :"+gsfile);
         var qname= gsfile.split(".")[0];//hardcoded for now
         //call gsupload 
 	var gscmd = "gsutil cp "+cfg.config["BASE_DATA_PATH"]+gsfile+" gs://"+cfg.getBucketName(qname);
+	// console.log("gscmd :"+gscmd);
           logger.info("gs command : "+gscmd);
           exec(gscmd,function(error,stdout,stderr){
 		if(error){
-		 logger.error("error in gs copy "+stderr+stdout)
+		 logger.error("error in gs copy "+stderr+stdout+" cmd used "+gscmd);
                  gsuploadRunning--;
 		 }
                 else{
                          //move files to gsuploaded folder
-                         logger.info("gs upload succeded"+gscmd);
+                         logger.info("gs upload succeded "+gscmd);
                         var cmd = "mv "+cfg.config["BASE_DATA_PATH"]+gsfile+" "+cfg.config["GSUPLOADED_DATA_PATH"];
                         logger.info(cmd);
                         exec(cmd,
-                              function(error,stdout,stderr){gsuploadRunning--;if(error){logger.error("error in moving gsuploaded file "+stderr+stdout);}});
+                              function(error,stdout,stderr){
+                                gsuploadRunning--;
+                                if(error){
+                                  logger.error("error in moving gsuploaded file "+stderr+stdout);
+                                  }else{
+                                    logger.info("move succeded");
+                                  }
+                                });
                     }
                 
              });
@@ -78,12 +87,13 @@ fs.readdir(cfg.config["BASE_DATA_PATH"],function(err,files){
      }
    gsuploadRunning--;
 });
-
+//console.log("calling ....gsupload end")
 }
 
 
 function bqimport(){
 // scan all gsuploaded files
+//console.log("calling ....bqimport");
 logger.info("calling bqimport "+cfg.config["BASE_DATA_PATH"]);
 bqImportrunning++;
 fs.readdir(cfg.config["GSUPLOADED_DATA_PATH"],function(err,files){
@@ -106,7 +116,7 @@ fs.readdir(cfg.config["GSUPLOADED_DATA_PATH"],function(err,files){
 		
 		if(error){
 		 logger.error("error in bq load"+ stderr);
-		 logger.error("error in bq load "+stdout+" "+error);
+		 logger.error("error in bq load "+stdout+" "+error+" bqcmd "+bqcmd);
                           //we should move them to failed folders
 		  var fcmd = "mv "+cfg.config["GSUPLOADED_DATA_PATH"]+gsfile+" "+ cfg.config["BQFAILED_DATA_PATH"];
 	          logger.info(fcmd);
@@ -142,5 +152,6 @@ fs.readdir(cfg.config["GSUPLOADED_DATA_PATH"],function(err,files){
  }
 });
 bqImportrunning--;
+//console.log("calling ....bqimport end");
 }
 

@@ -22,6 +22,9 @@ var express = require('express'),
    routes = require('./routes')
   , stylus = require('stylus');
 
+//console.log(cfg.getTableName("MIS"));
+//console.log(cfg.getTableName("BOSS"));
+
 /*http.createServer(function(request, response) {
   response.writeHead(200, {"Content-Type": "text/plain"});
   response.write("Hello World");
@@ -120,7 +123,8 @@ filesuploader.startup();
 });
 
 connection.on('error',function(err){
-logger.info("connection errored out ");
+logger.info("connection errored out "+err);
+//console.log("connection errored out );
 logger.error(err);
  setTimeout(launch(),5000);
 });
@@ -139,6 +143,7 @@ function qOnReady(q){
 }
 var count=0;
 var tim=Date.now();
+
 function subscriber(message,headers,deliveryinfo){
 count++;
 var msg = message.data.toString();
@@ -148,6 +153,7 @@ var msg = message.data.toString();
 
 //apply transformation 
 var bqfilepath=cfg.getFileName(deliveryinfo.queue);
+
 //var s3filepath=cfg.config["BASE_DATA_PATH"]+deliveryinfo.queue+".map";
 try{
      var val = bqutil.formBqCompliantLine(bqutil.formMapFromString(msg,keys.keys),columns.columns,ckmap.ckmap,ctypes)
