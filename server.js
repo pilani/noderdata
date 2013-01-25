@@ -16,6 +16,7 @@ var logger = require('./logger.js').logger;
 var filesuploader = require('./filesuploader/filesuploader.js');
 var messlog = require('./logger.js').logger.loggers.get('mess');
 var messerror = require('./logger.js').logger.loggers.get('messerror');
+var filelogger = require('./logger.js').logger.loggers.get('fileuploader');
 var httpport = cfg.config['HTTP-PORT'];
 //var http = require('http');
 var express = require('express'),
@@ -107,6 +108,9 @@ logger.info("created connection ");
 connection.on('ready',conOnReady);
 
 
+filelogger.info(" filesuploader stated : "+new Date());
+filesuploader.startup();
+
 connection.on('close',function(){ 
 logger.info('connection close called ');
 connOn=false;
@@ -118,8 +122,6 @@ connOn=false;
 		connection.close();
 	});
  }*/
-
-filesuploader.startup();
 });
 
 connection.on('error',function(err){

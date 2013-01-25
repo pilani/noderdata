@@ -1,157 +1,34 @@
-var fs = require('fs');
-var cfg = require('../config.js');
-var exec = require('child_process').exec;
-var logger = require('../logger.js').logger.loggers.get('bqimport');
+var bqf = require('./bqFileUploader.js'); 
+var gsf = require('./gsFileUploader.js'); 
+var filelogger = require('../logger.js').logger.loggers.get('fileuploader');
 
-var enableBqImport = true;
-exports.shutdown= function (){enableBqImport=false};
+
+exports.shutdown= function (){
+  
+  filelogger.info(" fileuploader started shuttingdown : "+new Date()+" GS enableGsImport : "
+    +gsf.enableGsImport+"  BQ enableBqImport : "+ bqf.enableBqImport);
+
+  gsf.enableGsImport=false;
+  bqf.enableBqImport=false
+
+  filelogger.info(" fileuploader shutdown : "+new Date()+" GS enableGsImport : "
+    +gsf.enableGsImport+"  BQ enableBqImport : "+ bqf.enableBqImport);
+};
 
 exports.startup = function startup(){
-  //console.log(" gsuploadRunning "+gsuploadRunning +" bqImportrunning "+bqImportrunning);  
-setTimeout(gsuploadRunner(),1000*60);
-setTimeout(bqImportRunner(),1000*60);
+filelogger.info(" fileuploader started : "+new Date());
+setTimeout(gsf.gsuploadRunner(),1000*60);
+setTimeout(bqf.bqImportRunner(),1000*60);
 }
-
-var gsuploadRunning=0;
-var bqImportrunning=0;
 
 exports.canWeShutdown = function canWeShutdown(){
- if(gsuploadRunning==0 && bqImportrunning==0){
+
+filelogger.info(" fileuploader got signal for shutdwon : "+new Date()+" GS No of Task to finsh : "
+    +gsf.no_gs_tasks_left_to_go+"  BQ No of Task to finsh : "+ bqf.no_bq_tasks_left_to_go);
+
+ if(gsf.no_gs_tasks_left_to_go==0 && bqf.no_bq_tasks_left_to_go==0){
   return true;
- }
+}else{
   return false;
 }
-
-function gsuploadRunner(){
-  if(gsuploadRunning==0 && enableBqImport){
-     gsupload();
-
-  }
-     setTimeout(gsuploadRunner,1000*2*60);
 }
-
-function bqImportRunner(){
-  if(bqImportrunning==0 && enableBqImport){
-     bqimport();
-
-  }
-     setTimeout(bqImportRunner,1000*2*60);
-}
-
-/**
-Scan all the files that rolled out from the consumer. Upload the csv file to bigquery and move the csv and s3 file to 
-gsuploaded folder
-*/
-function gsupload(){
-// scan and get all s3 and .csv files
-//console.log("calling ....gsupload...")
-gsuploadRunning++;
-logger.info("calling gs upload scanning base path "+cfg.config["BASE_DATA_PATH"]);
-fs.readdir(cfg.config["BASE_DATA_PATH"],function(err,files){
-//console.log("11111111111111111");
-     for(var i in files){
-//console.log("222222222222222222222" +files[i]);
-        if(files[i].indexOf("csv.20")==-1){//looks ugly but works in this millenium
-          continue;
-        }
-	gsuploadRunning++;
-        var gsfile = files[i].toString();console.log("gsfile :"+gsfile);
-        var qname= gsfile.split(".")[0];//hardcoded for now
-        //call gsupload 
-	var gscmd = "gsutil cp "+cfg.config["BASE_DATA_PATH"]+gsfile+" gs://"+cfg.getBucketName(qname);
-	// console.log("gscmd :"+gscmd);
-          logger.info("gs command : "+gscmd);
-          exec(gscmd,function(error,stdout,stderr){
-		if(error){
-		 logger.error("error in gs copy "+stderr+stdout+" cmd used "+gscmd);
-                 gsuploadRunning--;
-		 }
-                else{
-                         //move files to gsuploaded folder
-                         logger.info("gs upload succeded "+gscmd);
-                        var cmd = "mv "+cfg.config["BASE_DATA_PATH"]+gsfile+" "+cfg.config["GSUPLOADED_DATA_PATH"];
-                        logger.info(cmd);
-                        exec(cmd,
-                              function(error,stdout,stderr){
-                                gsuploadRunning--;
-                                if(error){
-                                  logger.error("error in moving gsuploaded file "+stderr+stdout);
-                                  }else{
-                                    logger.info("move succeded");
-                                  }
-                                });
-                    }
-                
-             });
-
-     }
-   gsuploadRunning--;
-});
-//console.log("calling ....gsupload end")
-}
-
-
-function bqimport(){
-// scan all gsuploaded files
-//console.log("calling ....bqimport");
-logger.info("calling bqimport "+cfg.config["BASE_DATA_PATH"]);
-bqImportrunning++;
-fs.readdir(cfg.config["GSUPLOADED_DATA_PATH"],function(err,files){
-
-     for(var i in files){
-
-         if(files[i].indexOf("csv.20")==-1){
-            continue;
-         }
-         bqImportrunning++;
-         var gsfile = files[i].toString();
-         
-
-        var qname= gsfile.split(".")[0];//hardcoded for now
-	var jobid=gsfile.replace(/\./g,"-");
-          //using filename as the job id to prevent duplicate imports into bigquery
-	  var bqcmd ="bq  load --allow_quoted_newlines --job_id  "+jobid+" "+cfg.getTableName(qname)+"  gs://"+cfg.getBucketName(qname)+gsfile; 
-          logger.info(bqcmd);
-          exec(bqcmd,function(error,stdout,stderr){
-		
-		if(error){
-		 logger.error("error in bq load"+ stderr);
-		 logger.error("error in bq load "+stdout+" "+error+" bqcmd "+bqcmd);
-                          //we should move them to failed folders
-		  var fcmd = "mv "+cfg.config["GSUPLOADED_DATA_PATH"]+gsfile+" "+ cfg.config["BQFAILED_DATA_PATH"];
-	          logger.info(fcmd);
-                  exec(fcmd,
-                              function(error,stdout,stderr){
-				bqImportrunning--;
-				if(error){
-                                 logger.error("error in moving gs to bq failed "+stderr+stdout);
-				}
-                             
-                                
-                             });
-		 }
-                else{
-                logger.info("bq load succeded");
-		var scmd = "mv "+cfg.config["GSUPLOADED_DATA_PATH"]+gsfile+" "+cfg.config["BQIMPORTED_DATA_PATH"];
-       			 logger.info(scmd);
-                          exec(scmd,
-                              function(error,stdout,standerr){
-                                 bqImportrunning--;
-				if(error){
-                                 logger.error("err in moving gscopy to bqimported "+stderr+" "+stdout+" "+error);
-				}
-                                  else{
-                                         // eventually we'll need to upload s3file to s3 and .csv file should be deleted
-					}
-                             });
-                    }
-             });
-
-     
-
- }
-});
-bqImportrunning--;
-//console.log("calling ....bqimport end");
-}
-
