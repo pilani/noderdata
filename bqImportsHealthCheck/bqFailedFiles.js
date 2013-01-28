@@ -8,6 +8,7 @@ var bqcmd ="ls -cr "+dir+"bqfailed/ | grep \".csv.20\"";
 exports.bqGetListOfFailedFiles = function(req, res) {
 bqGetListOfFailedFiles(function (response) {
 res.send(response);
+res.end();
 });
 }; 
 

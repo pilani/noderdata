@@ -8,6 +8,7 @@ var bqcmd ="ls -cr "+dir+"| grep \".csv.20\"";
 exports.bqGetListOfPendingFiles = function(req, res) {
 bqGetListOfPendingFiles(function (response) {
 res.send(response);
+res.end();
 });
 }; 
 
@@ -57,7 +58,7 @@ function executeCommand(cmd, callback)
    {
         if(error)
 	{	   
-	    logger.info("BQ Pending Files Error communicating......."+stderr);
+	    logger.error("BQ Pending Files Error communicating......."+stderr+stdout);
 	    callback("Error!");
         }
 	else

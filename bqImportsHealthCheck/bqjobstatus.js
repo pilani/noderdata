@@ -16,6 +16,7 @@ var bqcmd ="bq ls -j | awk 'NR <= 2 || $2==\"load\" {print $0}' | head -n7";
 exports.bqImportsHealthCheckService = function(req, res) {
 bqImportsHealthCheck(function (response) {
 res.send(response);
+res.end();
 });
 }; 
 

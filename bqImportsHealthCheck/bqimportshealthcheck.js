@@ -1,5 +1,6 @@
 exports.bqimportsstatus = function(req, res) {
 res.send();
+res.end();
 }; 
 
 var exec = require('child_process').exec;
