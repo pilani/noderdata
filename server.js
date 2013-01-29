@@ -216,6 +216,8 @@ loggerm("no active bq importer is running");
 	}
 
 }else{ loggerm("bq importer is still running , we will tell to schedule no further "); filesuploader.shutdown()};
+
+setTimeout(shutdown(),10*1000);
 }
 
 
@@ -224,9 +226,10 @@ loggerm("no active bq importer is running");
 process.on( 'SIGINT', shutdown);
 
 process.on('uncaughtException', function (exception) {
-   shutdown();
-    throw exception;
+    loggerm("unexcepted exception :"+exception.stack+ " Date : "+new Date());
+    shutdown();    
   });
+
 
 launch();
 
