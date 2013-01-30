@@ -4,7 +4,6 @@ var keys = require('./keys.js');
 var columns = require('./columns.js');
 var ckmap = require('./columnkeymapping.js');
 var fs = require('./fsutil.js');
-var du=require('./dateutil.js');
 //start(3000,'127.0.0.1');
 var fp= require('./fileproperties.js');
 var cfg =require('./config.js');	
@@ -172,8 +171,7 @@ try{
 
     if((Date.now()-fp.getFileStartTime(deliveryinfo.queue))>cfg.config["FILE_ROLLOVER_TIME"]){
 	logger.info("rolling over .................");
-        var timestamp = du.getTimeStamp();
-        fs.rollOverTheFileSync(bqfilepath,timestamp);
+        fs.rollOverTheFileSync(bqfilepath);
         //fs.rollOverTheFileSync(s3filepath,timestamp);
 	fp.setFileStartTime(deliveryinfo.queue,Date.now());
 	}

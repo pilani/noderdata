@@ -1,6 +1,7 @@
 var fs = require('fs');
 var logger = require('./logger.js').logger;
 var fileNotFoundlogger = require('./logger.js').logger.loggers.get('FileNotFoundError');
+var du=require('./dateutil.js');
 
 var opencalls = 0;
 var callback= function(err){
@@ -16,7 +17,7 @@ fs.appendFile(path,data,callback);
 
 }
 
-exports.rollOverTheFileSync = function rollOverTheFileSync(path,timestamptoappend){
+exports.rollOverTheFileSync = function rollOverTheFileSync(path){
 	fs.exists(path, function(exists) {
   		if (exists) {
    		 // rename file
@@ -28,7 +29,8 @@ exports.rollOverTheFileSync = function rollOverTheFileSync(path,timestamptoappen
  		});
 }
 
-function renameFile(path){
+function renameFile(path){	
+    var timestamptoappend = du.getTimeStamp();
 	fs.renameSync(path,path+"."+timestamptoappend,function (err){
 	if(err){
 		fileNotFoundlogger.error(" Renaming File throw exception : "+err);
