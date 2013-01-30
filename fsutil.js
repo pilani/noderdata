@@ -1,6 +1,6 @@
 var fs = require('fs');
 var logger = require('./logger.js').logger;
-var filelogger = require('./logger.js').logger.loggers.get('fileuploader');
+var fileNotFoundlogger = require('./logger.js').logger.loggers.get('FileNotFoundError');
 
 var opencalls = 0;
 var callback= function(err){
@@ -17,12 +17,26 @@ fs.appendFile(path,data,callback);
 }
 
 exports.rollOverTheFileSync = function rollOverTheFileSync(path,timestamptoappend){
-fs.renameSync(path,path+"."+timestamptoappend,, function (err){
+	fs.exists(path, function(exists) {
+  		if (exists) {
+   		 // rename file
+   		 	renameFile(path);
+  		} else {
+    		// not found
+    		fileNotFoundlogger.error(" File Not found : "+path+" date : "+new Date());
+ 		 }
+ 		});
+}
+
+function renameFile(path){
+	fs.renameSync(path,path+"."+timestamptoappend,function (err){
 	if(err){
-		filelogger.error(" Renaming File throw exception : "+err);
+		fileNotFoundlogger.error(" Renaming File throw exception : "+err);
 	}
 });
 }
+
+
 
 exports.allWritesDrained= function allWritesDrained(){
 	logger.info("open calls left "+opencalls);

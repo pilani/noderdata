@@ -38,6 +38,15 @@ winston.loggers.add('fileuploader', {
       filename: bdp+'fileuploader.log',maxsize:(1024*1000*10),maxFiles:20
     }
   });
+winston.loggers.add('FileNotFoundError', {
+   console: {
+      level: 'none'
+
+    },
+    file: {
+      filename: bdp+'FileNotFoundError.log',maxsize:(1024*1000*10),maxFiles:20
+    }
+  });
 
 exports.logger=winston;
 
