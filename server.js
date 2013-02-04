@@ -127,7 +127,7 @@ connection.on('error',function(err){
 logger.info("connection errored out "+err);
 //console.log("connection errored out );
 logger.error(err);
- setTimeout(launch(),5000);
+ setTimeout(launch,5000);
 });
 
 
@@ -204,8 +204,8 @@ function shutdown(){
 if(filesuploader.canWeShutdown()){
 loggerm("no active bq importer is running");
    loggerm("no active bq importer is running");
-	//if(fs.allWritesDrained() && !connOn){
-  if(fs.allWritesDrained()){
+	if(fs.allWritesDrained() && !connOn){
+  //if(fs.allWritesDrained()){
 	loggerm("Actually exiting "); 
 
 	sleep(3000);
@@ -216,7 +216,7 @@ loggerm("no active bq importer is running");
 
 }else{ loggerm("bq importer is still running , we will tell to schedule no further "); filesuploader.shutdown()};
 
-setTimeout(shutdown(),10*1000);
+setTimeout(shutdown,10*1000);
 }
 
 

@@ -17,8 +17,8 @@ exports.shutdown= function (){
 
 exports.startup = function startup(){
 filelogger.info(" fileuploader started : "+new Date());
-setTimeout(gsf.gsuploadRunner(),1000*60);
-setTimeout(bqf.bqImportRunner(),1000*60);
+setTimeout(gsf.gsuploadRunner,1000*60);
+setTimeout(bqf.bqImportRunner,1000*60);
 }
 
 exports.canWeShutdown = function canWeShutdown(){
