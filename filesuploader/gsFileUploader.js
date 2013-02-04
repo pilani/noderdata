@@ -19,19 +19,21 @@ exports.gsuploadRunner=function gsuploadRunner(){
 }
 
 
-function laucnGsUpload(err,files){
+function laucnGsUpload(err,map){
  if(err){
   filelogger.error(" laucnGsUpload  Failed : "+new Date()+" error : "+err);
  }else{
-  no_gs_tasks_left_to_go = files.length;
-  logger.info(" launching  Bq Copy : "+new Date()+" No of Files : "+no_gs_tasks_left_to_go);
-  async.forEachSeries(files,processGsfile);
+   no_gs_tasks_left_to_go = Object.keys(map).length;
+  logger.info(" launching  Bq Copy : "+new Date()+" No of Files : "+no_gs_tasks_left_to_go);  
+   async.forEachSeries(Object.keys(map),function(key,callback){
+    processGsfile(key,map[key],callback)
+  });
 }
 }
 
-function processGsfile(file,callback){
-  logger.info(" Copying  file to GS  Started: "+new Date()+" File Name : "+file.name);
-    async.waterfall([function wrap(callback){callback(null,file.name,file.queName);},moveFileToGS,moveFileToGSUploaded  
+function processGsfile(key,val,callback){
+  logger.info(" Copying  file to GS  Started: "+new Date()+" Bucket Name : "+key+" no of files : "+val.length);
+    async.waterfall([function wrap(callback){callback(null,key,val);},moveFileToGS,moveFileToGSUploaded  
     ],finalCallBackGSCopy);
 
     callback();
@@ -68,20 +70,31 @@ function getGSCopyFiles(callback){
 }
 
 function parseFilesToCopy(files){
-  var filesArray = new Array(); 
-  var counter =0;
+  var map = new Object(); 
    for(var i in files){
         
         if(files[i].indexOf("csv.20")==-1){         
           continue;
         }
+        
         var gsfile = files[i].toString();
         var qname= gsfile.split(".")[0];
-      filesArray[counter] = new fileInfo(gsfile,qname);
-        counter++;
+        var key = cfg.getBucketName(qname);
+
+        if(typeof map[key] == 'undefined'){
+            var filesArray = new Array(); 
+            var file = new fileInfo(gsfile,qname);
+            filesArray.push(file);
+            map[key] = filesArray;
+        }else{
+          var prevfilesArray = map[key];
+           var file = new fileInfo(gsfile,qname);
+           prevfilesArray.push(file);
+           map[key] = prevfilesArray;
+        }
     }
 
-    return filesArray;
+    return map;
 }
 
 function executeCommand(cmd,callback) 
@@ -89,7 +102,7 @@ function executeCommand(cmd,callback)
    exec(cmd,function(error,stdout,stderr)
    {
       if(error){
-        filelogger.error(" executeCommand failed : "+new Date()+" error :"+error);
+        filelogger.error(" executeCommand failed : "+new Date()+" error :"+error+"cmd "+cmd);
         callback(stderr);
       }
       else
@@ -100,10 +113,18 @@ function executeCommand(cmd,callback)
    });
  }
 
- function moveFileToGS(filename,queName,callback){
+ function moveFileToGS(key,val,callback){
   //console.log("moveFileToGS :"+filename);
  // var gscmd = "gsutil cp /home/bhaskar/.rdata/rfiles1/"+filename+" gs://rdataprod-node/";
-  var gscmd = "gsutil cp "+cfg.config["BASE_DATA_PATH"]+filename+" gs://"+cfg.getBucketName(queName);
+  //var gscmd = "gsutil cp "+cfg.config["BASE_DATA_PATH"]+filename+" gs://"+cfg.getBucketName(queName);
+  var gscmd='';
+  for(obj in val){    
+
+    if(gscmd!=''){
+      gscmd+=";";      
+    }
+    gscmd+="gsutil cp "+cfg.config["BASE_DATA_PATH"]+val[obj].name+" gs://"+key;
+  }
   logger.info(" GS import cmd "+new Date()+" cmd : "+gscmd);
   executeCommand(gscmd, function (error,cmdResult){
      if(error){
@@ -112,13 +133,22 @@ function executeCommand(cmd,callback)
        // throw error;
      }else{
      logger.info(" GS import cmd successed result : "+new Date()+" cmd : "+gscmd+" cmd result : "+cmdResult);
-     callback(null,filename);
+     callback(null,key,val);
    }
   }); 
 }
-function moveFileToGSUploaded(filename,callback){
+function moveFileToGSUploaded(key,val,callback){
 //  console.log(callback);
-  var cmd = "mv "+cfg.config["BASE_DATA_PATH"]+filename+"  "+cfg.config["GSUPLOADED_DATA_PATH"];
+ // var cmd = "mv "+cfg.config["BASE_DATA_PATH"]+filename+"  "+cfg.config["GSUPLOADED_DATA_PATH"];
+ var cmd="mv -t "+cfg.config["GSUPLOADED_DATA_PATH"]+" ";
+ var counter =0;
+  for(obj in val){
+    if(counter>0){   
+      cmd+=" ";
+    }
+    cmd+=cfg.config["BASE_DATA_PATH"]+val[obj].name;  
+    counter++;     
+  }
   executeCommand(cmd, function (error,cmdResult){
       if(error){
          filelogger.error(" moveFileToGSUploaded failed "+new Date()+" cmd : "+cmd+" error : "+error);

@@ -204,13 +204,14 @@ function shutdown(){
 if(filesuploader.canWeShutdown()){
 loggerm("no active bq importer is running");
    loggerm("no active bq importer is running");
-	if(fs.allWritesDrained() && !connOn){
+	//if(fs.allWritesDrained() && !connOn){
+  if(fs.allWritesDrained()){
 	loggerm("Actually exiting "); 
 
 	sleep(3000);
 	process.exit();
 	}else{
-	loggerm("Files are still being written we will wait or connection end is still not called");
+	loggerm("Files are still being written we will wait or connection end is still not called connOn"+connOn);
 	}
 
 }else{ loggerm("bq importer is still running , we will tell to schedule no further "); filesuploader.shutdown()};
