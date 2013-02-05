@@ -29,6 +29,15 @@ winston.loggers.add('messerror', {
       filename: bdp+'messerror.log',maxsize:(1024*1000*10),maxFiles:20
     }
   });
+winston.loggers.add('rtd', {
+   console: {
+      level: 'none'
+
+    },
+    file: {
+      filename: bdp+'rtd.log',maxsize:(1024*1000*10),maxFiles:10
+    }
+  });
 winston.loggers.add('fileuploader', {
    console: {
       level: 'none'
