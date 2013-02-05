@@ -21,20 +21,10 @@ var httpport = cfg.config['HTTP-PORT'];
 var express = require('express'),
    routes = require('./routes')
   , stylus = require('stylus');
-
-//console.log(cfg.getTableName("MIS"));
-//console.log(cfg.getTableName("BOSS"));
-
-/*http.createServer(function(request, response) {
-  response.writeHead(200, {"Content-Type": "text/plain"});
-  response.write("Hello World");
-  response.end();
-}).listen(httpport);*/
-
 obj = require('./bqImportsHealthCheck/bqjobstatus'); 
 pendingFilesObj = require('./bqImportsHealthCheck/bqPendingFiles.js'); 
 failedFilesObj = require('./bqImportsHealthCheck/bqFailedFiles.js');
-
+rtd  = require('./rtd/realTimeData.js');
 var app = express();
 
 app.configure(function(){
@@ -111,16 +101,9 @@ filelogger.info(" filesuploader stated : "+new Date());
 filesuploader.startup();
 
 connection.on('close',function(){ 
-logger.info('connection close called ');
+loggerm('connection close called ');
 connOn=false;
- /*for(var i =0;i<qs.length;i++){
-  logger.info("going to unsubscribe "+qs[i].name);
-  qs[i].unsubscribe(qs[i].name);
-  /* qs[i].destroy().addCallback(function(){
-                logger.info("q destroyed");
-		connection.close();
-	});
- }*/
+
 });
 
 connection.on('error',function(err){
@@ -157,9 +140,12 @@ var bqfilepath=cfg.getFileName(deliveryinfo.queue);
 
 //var s3filepath=cfg.config["BASE_DATA_PATH"]+deliveryinfo.queue+".map";
 try{
-     var val = bqutil.formBqCompliantLine(bqutil.formMapFromString(msg,keys.keys),columns.columns,ckmap.ckmap,ctypes)
-      messlog.info(val);
+     var kvmap = bqutil.formMapFromString(msg,keys.keys);
+     var val = bqutil.formBqCompliantLine(kvmap,columns.columns,ckmap.ckmap,ctypes)
+     messlog.info(val);
      fs.appendToFile(bqfilepath,val+"\n",errHandler);
+     rtd.log2RealTimeDataStore(kvmap);
+
 }catch(err){
   messerror.error("error in parsing "+err.stack);
 }
@@ -202,9 +188,9 @@ function shutdown(){
   loggerm("Calling  connection end");
   connection.end();
 if(filesuploader.canWeShutdown()){
-loggerm("no active bq importer is running");
    loggerm("no active bq importer is running");
-	if(fs.allWritesDrained() && !connOn){
+   loggerm("no active bq importer is running");
+	if(fs.allWritesDrained() && !connOn && rtd.canWeShutdown()){
   //if(fs.allWritesDrained()){
 	loggerm("Actually exiting "); 
 

@@ -6,17 +6,18 @@ var map = new Object();
 
 map["MONGO_URL"]="ec2-54-251-95-173.ap-southeast-1.compute.amazonaws.com/rdatart";//for the real time data store
 map["PG_URL"]="tcp://produser:password@ec2-54-251-95-173.ap-southeast-1.compute.amazonaws.com/rdatarealtime";
+map["ENABLE_RTD"]=false;
 map["MONGO_EXP_TIME"] = "600";
 map["MIS"]="MIS"; 
 map["FILE_ROLLOVER_TIME"]=1*60*1000;	 	
-map["BASE_DATA_PATH"]="/home/bhaskar/.rdata/rfiles1/";
+map["BASE_DATA_PATH"]="/home/pradeep/.rdata/rfiles1/";
 map["SRV_FILE_PREFIX"]="1";// should be read outside the server
 map["BASE_GSSTORAGE_BUCKET"]="rdataprod-node/";
 map["BASE_TABLE"]="rbdata.dummy_node";
 map["GSUPLOADED_DATA_PATH"]=map["BASE_DATA_PATH"]+"gsuploaded/";
 map["BQFAILED_DATA_PATH"]=map["BASE_DATA_PATH"]+"bqfailed/";
 map["BQIMPORTED_DATA_PATH"]=map["BASE_DATA_PATH"]+"bqimported/";
-map["RABBIT-HOST"]="10.120.10.33";
+map["RABBIT-HOST"]="rdata.pilanisoftlabs.com";
 map["HTTP-PORT"]="8080";
 map["BQ_IMPORT_DELAY_TIME"]= 10;	 
 //map["RABBIT-HOST"]="localhost";
@@ -27,7 +28,7 @@ map["BQ_IMPORT_DELAY_TIME"]= 10;
 		    ,"UMS_IMP","QUOTABOSS_IMP","SEATSELLER_IMP","HD_IMP","SS_PERF_BUCKET","SS_INVENTORY_BUCKET", 
 		    "SS_API_BUCKET","RB_ANALYTICS_BUCKET","SS_USER_ANALYTICS_BUCKET"];*/
 
-map["QS"]=["LIS","BOSS"];
+map["QS"]=["BOSS"];
 
 
 map["Q_BUCKET_MAP"] = {"SS_PERF_BUCKET":"rbdata.SS_PERF_BUCKET",

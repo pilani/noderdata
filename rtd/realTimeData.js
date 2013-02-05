@@ -22,10 +22,8 @@ mongoose.model('rdata', rdataSchema);
 mongoose.connect('mongodb://'+cfg["MONGO_URL"],function(err){if(err){loggit("error in connecting to mongo"+err.stack)}});
 var Rdata = mongoose.model('rdata');
 
-var singleRow = new Rdata({
-});
 
-function pgQuery(query,callback){
+exports.pgQuery = function pgQuery(query,callback){
 	pgClient.query(query,function (err,result){
         if(err){
         	loggit("error in querying pg"+err.stack);
@@ -37,28 +35,47 @@ function pgQuery(query,callback){
 
 
 /*take the key value map and log it to real time storage which in our case is mongodb*/
- function log2RealTimeDataStore(kvmap){
+var rtdLeft =0;
+exports.log2RealTimeDataStore = log2RealTimeDataStore;
+
+function log2RealTimeDataStore(kvmap){
+     //console.log("LOGGING RTD");
+     if(cfg["ENABLE_RTD"]){
+        console.log("dasdsad");
+     var singleRow = new Rdata({
+     });
 
      for(var key in kvmap){
-     	singleRow.setValue(key,kvmap[key]);
+        singleRow.setValue(key,kvmap[key]);
      }
-     singleRow.save(function(err){loggit(err)});
-
+     rtdLeft++;
+     singleRow.save(function(err){rtdLeft--; loggit(err)});
+    }
 }
 
 function loggit(mess){
 	rtd.log(mess);
 }
 
+exports.canWeShutdown = function canWeShutdown(){
+    console.log("rtds left "+rtdLeft);
+    if(rtdLeft==0)
+        return true;
+    else 
+        return false;
+}
 
 
-//test();
+
+test();
 
 function test(){
     var obj = new Object();
     obj["key1"] = "value1";
     obj["key2"] = "value2";
 	log2RealTimeDataStore(obj);
+    obj["key1"] = "sdsad";
+    log2RealTimeDataStore(obj);
     //pgQuery("select count(*) from customer_reviews",function(result){loggit("The result is "+JSON.stringify(result))});
 }
 
