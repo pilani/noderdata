@@ -9,6 +9,8 @@
     "nib": "*",
     "amqp":"*",
     "node-uuid":"*",
-    "winston":"*"
+    "winston":"*",
+    "mongoose":"*",
+    "pg":"*"
   }
 }
