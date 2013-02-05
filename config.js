@@ -1,4 +1,12 @@
 var map = new Object();
+
+//1- source account[region] 2 -destination account[region]
+//2 - source  account[region] 2 - destination account
+//3 -
+
+map["MONGO_URL"]="ec2-54-251-95-173.ap-southeast-1.compute.amazonaws.com/rdatart";//for the real time data store
+map["PG_URL"]="tcp://produser:password@ec2-54-251-95-173.ap-southeast-1.compute.amazonaws.com/rdatarealtime";
+map["MONGO_EXP_TIME"] = "600";
 map["MIS"]="MIS"; 
 map["FILE_ROLLOVER_TIME"]=1*60*1000;	 	
 map["BASE_DATA_PATH"]="/home/bhaskar/.rdata/rfiles1/";
