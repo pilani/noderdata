@@ -56,6 +56,15 @@ winston.loggers.add('FileNotFoundError', {
       filename: bdp+'FileNotFoundError.log',maxsize:(1024*1000*10),maxFiles:20
     }
   });
+winston.loggers.add('FormMapError', {
+   console: {
+      level: 'none'
+
+    },
+    file: {
+      filename: bdp+'FormMapError.log',maxsize:(1024*1000*10),maxFiles:20
+    }
+  });
 
 exports.logger=winston;
 
