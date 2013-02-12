@@ -81,15 +81,15 @@ var iStartIndex =0;
     iNextIndex = val.indexOf(';',iStartIndex);
     var mval = val.substring(iStartIndex,iNextIndex);
     iStartIndex = iNextIndex+1;  
-    //console.log("Key : "+mkey+" val : "+mval);
-    }
-    }catch(err){
+    console.log("Key : "+mkey+" val : "+mval);
+  }
+  catch(err){
      formmapError.error("error in parsing "+err.stack);
      kvmap["UUID"]=uuid.v1();//Time based guid to distinguish each line at the consumer level
      kvmap["CONSUMER_APP_TYPE"] = "NODE";
      kvmap["RESPONSE"] = err.stack;
      return kvmap;
-  }
+   }
   }
 }
 
