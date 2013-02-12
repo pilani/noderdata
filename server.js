@@ -140,7 +140,7 @@ var bqfilepath=cfg.getFileName(deliveryinfo.queue);
 
 //var s3filepath=cfg.config["BASE_DATA_PATH"]+deliveryinfo.queue+".map";
 try{
-     var kvmap = bqutil.formMapFromString(msg,keys.keys);
+     var kvmap = bqutil.formMapFromStringV2(msg,keys.keys);
      var val = bqutil.formBqCompliantLine(kvmap,columns.columns,ckmap.ckmap,ctypes)
      messlog.info(val);
      fs.appendToFile(bqfilepath,val+"\n",errHandler);
