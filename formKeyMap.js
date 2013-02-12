@@ -55,7 +55,6 @@ var val = msg;
 		}
        }
 kvmap["UUID"]=uuid.v1();//Time based guid to distinguish each line at the consumer level
-kvmap["CONSUMER_APP_TYPE"] = "NODE";
 return kvmap;
 
 }
