@@ -16,7 +16,7 @@ exports.bqImportRunner =function bqImportRunner(){
   if(no_bq_tasks_left_to_go==0 && enableBqImport){   
      getBqCopyFiles(laucnBqUpload); 
   }
-   setTimeout(bqImportRunner,1000*2*60);
+   setTimeout(bqImportRunner,1000*4*60);
 }
 
 function laucnBqUpload(err,map){
