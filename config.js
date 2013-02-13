@@ -4,8 +4,8 @@ var map = new Object();
 //2 - source  account[region] 2 - destination account
 //3 -
 
-map["MONGO_URL"]="ec2-54-251-95-173.ap-southeast-1.compute.amazonaws.com/rdatart";//for the real time data store
-map["PG_URL"]="tcp://produser:password@ec2-54-251-95-173.ap-southeast-1.compute.amazonaws.com/rdatarealtime";
+map["MONGO_URL"]="xxx.com/rdatart";//for the real time data store
+map["PG_URL"]="tcp://user:password@xxx.com/rdatarealtime";
 map["ENABLE_RTD"]=false;
 map["MONGO_EXP_TIME"] = "600";
 map["MIS"]="MIS"; 
@@ -17,25 +17,15 @@ map["BASE_TABLE"]="rbdata.dummy_node";
 map["GSUPLOADED_DATA_PATH"]=map["BASE_DATA_PATH"]+"gsuploaded/";
 map["BQFAILED_DATA_PATH"]=map["BASE_DATA_PATH"]+"bqfailed/";
 map["BQIMPORTED_DATA_PATH"]=map["BASE_DATA_PATH"]+"bqimported/";
-map["RABBIT-HOST"]="rdata.pilanisoftlabs.com";
+map["RABBIT-HOST"]="rabbitmqendpoint.com";
 map["HTTP-PORT"]="8080";
 map["BQ_IMPORT_DELAY_TIME"]= 10;	 
-//map["RABBIT-HOST"]="localhost";
-/*map["QS"]=["DEFAULT","LIS","RBJAVA","BOSS","MIS","RBMAIN","VOLVO","UMS","QUOTABOSS",
-		   "SEATSELLER","HD","RDATA_TRACK","DEFAULT_API","LIS_API","RBJAVA_API", "BOSS_API","MIS_API",
-		    "RBMAIN_API","VOLVO_API","UMS_API","QUOTABOSS_API","SEATSELLER_API","HD_API",
-		    "DEFAULT_IMP","LIS_IMP","RBJAVA_IMP","BOSS_IMP","MIS_IMP","RBMAIN_IMP","VOLVO_IMP"
-		    ,"UMS_IMP","QUOTABOSS_IMP","SEATSELLER_IMP","HD_IMP","SS_PERF_BUCKET","SS_INVENTORY_BUCKET", 
-		    "SS_API_BUCKET","RB_ANALYTICS_BUCKET","SS_USER_ANALYTICS_BUCKET"];*/
 
-map["QS"]=["BOSS"];
+map["QS"]=["QNAME"];
 
 
-map["Q_BUCKET_MAP"] = {"SS_PERF_BUCKET":"rbdata.SS_PERF_BUCKET",
-					   "SS_INVENTORY_BUCKET":"rbdata.SS_INVENTORY_BUCKET",
-						"SS_API_BUCKET":"rbdata.SS_API_BUCKET",
-						"RB_ANALYTICS_BUCKET":"rbdata.RB_ANALYTICS_BUCKET",
-						"SS_USER_ANALYTICS_BUCKET":"rbdata.SS_USER_ANALYTICS_BUCKET"};
+map["Q_BUCKET_MAP"] = {"BUCKET_1":"rbdata.PERF_BUCKET",
+					   "BUCKET_2":"rbdata.INVENTORY_BUCKET"};
 
 exports.config=map;
 
