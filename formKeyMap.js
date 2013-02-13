@@ -1,5 +1,5 @@
 var uuid=require('node-uuid');
-var formmapError = require('../logger.js').logger.loggers.get('FormMapError');
+var formmapError = require('./logger.js').logger.loggers.get('FormMapError');
 
 
 
@@ -20,7 +20,7 @@ var kvpairs = msg.split(";");
 }*/
 
 
-eexports.formMapFromString = function formMapfromString(msg,keys,columns,ckmap){
+exports.formMapFromString = function formMapfromString(msg,keys,columns,ckmap){
 var iStart=0;
 var kvmap = new Object();
 var curKey,curVal,prevKey;
@@ -67,6 +67,9 @@ var curKey,curVal,prevKey;
 var val = msg;
 var iNextIndex =0;
 var iStartIndex =0;
+var prevKey = "";
+
+console.log(" message : "+msg);
   for(;;){
     try{
     iNextIndex = val.indexOf(':',iStartIndex);
@@ -74,14 +77,28 @@ var iStartIndex =0;
     kvmap["UUID"]=uuid.v1();//Time based guid to distinguish each line at the consumer level
     kvmap["CONSUMER_APP_TYPE"] = "NODE";      
     //  break;
+   // printValues(kvmap);
     return kvmap;
     }
-    var mkey = val.substring(iStartIndex,iNextIndex);
+    
+    var curKey = val.substring(iStartIndex,iNextIndex);    
     iStartIndex = iNextIndex+1;
     iNextIndex = val.indexOf(';',iStartIndex);
     var mval = val.substring(iStartIndex,iNextIndex);
+    
+    if(keys[curKey]==undefined)
+    {
+      kvmap[prevKey]=kvmap[prevKey]+curKey+mval;
+    }
+    else
+    {      
+      kvmap[curKey]= mval;
+      prevKey = curKey;
+    }
+
     iStartIndex = iNextIndex+1;  
-    console.log("Key : "+mkey+" val : "+mval);
+
+   // console.log("Key : "+mkey+" val : "+mval);
   }
   catch(err){
      formmapError.error("error in parsing "+err.stack);
@@ -93,6 +110,11 @@ var iStartIndex =0;
   }
 }
 
+function printValues(kvmap){
+  for (var key in kvmap) {
+    console.log(" key : "+keysy+ " Value : "+kvmap[key]);
+  }
+}
 exports.formBqCompliantLine = function formBqCompliantLine(kvmap,columns,ckmap,ctypes){
    var bqline = '';
         for(var i=0;i<columns.length;i++){
