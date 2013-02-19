@@ -34,7 +34,8 @@ Once the import is sucessfull the file will be deleted from Gsupload folder, els
 
 We have a UI to show few stats in this module using Jade as a template engine and Stylus as CSS engine. 
 
-Stats :    Pending Files  - It will show list of current pending files to upload.
+Stats :    
+           Pending Files  - It will show list of current pending files to upload.
            Failed Files  - It will show list of files that failed to upload.
            URL - IP of node running instance: port defined in config file/bqhome
     
