@@ -6,12 +6,12 @@ move it to Google cloud storage then import into BigQuery from Google cloud stor
 
 Required Modules for node rdata :
 
-amqp
-async
-express
-winston
-nib
-node-uuid
-jade
-stylus
+amqp<br>
+async<br>
+express<br>
+winston<br>
+nib<br>
+node-uuid<br>
+jade<br>
+stylus<br>
 
