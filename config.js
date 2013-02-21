@@ -4,10 +4,18 @@ var map = new Object();
 //2 - source account[region] 2 - destination account
 //3 -
 
+//real time data store configs
+map["ALLOWED_QS"]= {"Q1":true,"Q2":true};// making the value false wont disable the queue u have to comple
+//tely remove the element
+map["MBS"] = 1000;
+map["MONGO_EXP_TIME"] = "600";
+//
+
+
 map["MONGO_URL"]="xxx.com/rdatart";//for the real time data store
 map["PG_URL"]="tcp://user:password@xxx.com/rdatarealtime";
 map["ENABLE_RTD"]=false;
-map["MONGO_EXP_TIME"] = "600";
+
 map["MIS"]="MIS";
 map["FILE_ROLLOVER_TIME"]=1*60*1000;	
 map["BASE_DATA_PATH"]="/home/username/.data/files1/";
