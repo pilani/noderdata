@@ -108,7 +108,7 @@ exports.shutDown = function shutDown(){
      flush2Rtsd();// flush out any remaining rtds;
 }
 
-test();
+//test();
 var sdate ;
 function test(){
     var obj = new Object();
