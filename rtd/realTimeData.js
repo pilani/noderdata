@@ -21,7 +21,10 @@ rdataSchema.index({ "mserverTime": 1 }, { expireAfterSeconds: cfg["MONGO_EXP_TIM
 mongoose.model('rdata', rdataSchema);
 mongoose.connect('mongodb://'+cfg["MONGO_URL"],function(err){if(err){loggit("error in connecting to mongo"+err.stack)}});
 var Rdata = mongoose.model('rdata');
-
+var singleRow = new Rdata({
+     });
+singleRow.setValue("key","value");
+singleRow.save(function(err){loggit(err)});
 
 exports.pgQuery = function pgQuery(query,callback){
 	pgClient.query(query,function (err,result){
@@ -53,29 +56,76 @@ function log2RealTimeDataStore(kvmap){
     }
 }
 
+var mdocs= [];
+
+function log2RealTimeDataStor(kvmap,queue){
+     
+     if(cfg["ENABLE_RTD"] && !(cfg["ALLOWED_QS"][queue] === undefined)){
+    
+     var doc = new Object() ;
+     doc["mserverTime"] = new Date();
+     for(var key in kvmap){
+        doc[key]=kvmap[key];
+     }
+     mdocs.push(doc);
+     if(mdocs.length>cfg["MBS"]){
+        flush2Rtsd();
+     }
+    
+    }
+}
+
+//flush to real time storage
+function flush2Rtsd(){
+    loggit(" mdocs length "+mdocs.length+new Date());
+    if(mdocs.length==0) return;
+    rtdLeft++;
+ Rdata.collection.insert(mdocs,{},function(err){
+    rtdLeft--;
+   if(err){
+    loggit(" error in flushing to mongo "+err);
+   }else{ loggit(" successfully flished to mongo "+new Date()+ "   "+ sdate) };
+ });
+   mdocs = [];
+}
+
 function loggit(mess){
+    console.log(mess);
 	rtd.log(mess);
 }
 
-exports.canWeShutdown = function canWeShutdown(){
-    console.log("rtds left "+rtdLeft);
-    if(rtdLeft==0)
+exports.canWeShutdown = function canWeShutDown(){
+    if(mdocs.length ==0 && rtdLeft==0){
+        loggit(" rtd is shutdown")
         return true;
-    else 
-        return false;
+    }
+    loggit(" rtd can't be shutdown yet");
+   return false;
 }
 
 
+exports.shutDown = function shutDown(){
+     flush2Rtsd();// flush out any remaining rtds;
+}
 
 test();
-
+var sdate ;
 function test(){
     var obj = new Object();
     obj["key1"] = "value1";
     obj["key2"] = "value2";
-	log2RealTimeDataStore(obj);
-    obj["key1"] = "sdsad";
-    log2RealTimeDataStore(obj);
+    for(var j;j<30;j++){
+        obj[j]="adasdsadkasdkahsdkhashdkashdkhaskdhksahdkhaskdhakshdkahdkhkashdkhaksdhkahsdkhaskdhhduashdsauhdkuahsduh";
+    }
+    sdate= new Date();
+    console.log("test started "+new Date());
+   for(var i =0 ;i< 100000;i++){
+	obj["i"]= i;
+    log2RealTimeDataStor(obj,"MISn");
+    break;
+    }
+    flush2Rtsd();
+    console.log(" test ended "+new Date());
     //pgQuery("select count(*) from customer_reviews",function(result){loggit("The result is "+JSON.stringify(result))});
 }
 
