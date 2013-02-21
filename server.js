@@ -144,7 +144,7 @@ try{
      var val = bqutil.formBqCompliantLine(kvmap,columns.columns,ckmap.ckmap,ctypes)
      messlog.info(val);
      fs.appendToFile(bqfilepath,val+"\n",errHandler);
-     rtd.log2RealTimeDataStore(kvmap);
+     rtd.log2RealTimeDataStore(kvmap,deliveryinfo.queue);
 
 }catch(err){
   messerror.error("error in parsing "+err.stack);
@@ -187,6 +187,7 @@ function shutdown(){
   loggerm( "\n trying to gracefully shut down from  SIGINT (Crtl-C)" );
   loggerm("Calling  connection end");
   connection.end();
+  rtd.shutdown();
 if(filesuploader.canWeShutdown()){
    loggerm("no active bq importer is running");
    loggerm("no active bq importer is running");
@@ -197,6 +198,7 @@ if(filesuploader.canWeShutdown()){
 	sleep(3000);
 	process.exit();
 	}else{
+
 	loggerm("Files are still being written we will wait or connection end is still not called connOn"+connOn);
 	}
 
