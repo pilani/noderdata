@@ -23,7 +23,7 @@ mongoose.connect('mongodb://'+cfg["MONGO_URL"],function(err){if(err){loggit("err
 var Rdata = mongoose.model('rdata');
 var singleRow = new Rdata({
      });
-singleRow.setValue("key","value");
+singleRow.setValue("key","value");// kind of a hack so that schema is flushed to mongo before actual insertion of data begins
 singleRow.save(function(err){loggit(err)});
 
 exports.pgQuery = function pgQuery(query,callback){
@@ -39,22 +39,8 @@ exports.pgQuery = function pgQuery(query,callback){
 
 /*take the key value map and log it to real time storage which in our case is mongodb*/
 var rtdLeft =0;
-exports.log2RealTimeDataStore = log2RealTimeDataStore;
+exports.log2RealTimeDataStore = log2RealTimeDataStor;
 
-function log2RealTimeDataStore(kvmap){
-     //console.log("LOGGING RTD");
-     if(cfg["ENABLE_RTD"]){
-        console.log("dasdsad");
-     var singleRow = new Rdata({
-     });
-
-     for(var key in kvmap){
-        singleRow.setValue(key,kvmap[key]);
-     }
-     rtdLeft++;
-     singleRow.save(function(err){rtdLeft--; loggit(err)});
-    }
-}
 
 var mdocs= [];
 
@@ -77,7 +63,7 @@ function log2RealTimeDataStor(kvmap,queue){
 
 //flush to real time storage
 function flush2Rtsd(){
-    loggit(" mdocs length "+mdocs.length+new Date());
+    
     if(mdocs.length==0) return;
     rtdLeft++;
  Rdata.collection.insert(mdocs,{},function(err){
@@ -104,7 +90,7 @@ exports.canWeShutdown = function canWeShutDown(){
 }
 
 
-exports.shutDown = function shutDown(){
+exports.shutdown = function shutdown(){
      flush2Rtsd();// flush out any remaining rtds;
 }
 
