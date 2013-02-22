@@ -69,7 +69,7 @@ var iNextIndex =0;
 var iStartIndex =0;
 var prevKey = "";
 
-console.log(" message : "+msg);
+
   for(;;){
     try{
     iNextIndex = val.indexOf(':',iStartIndex);
