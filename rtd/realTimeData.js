@@ -9,6 +9,8 @@ var pgClient = new pg.Client(pgconnectstring);
 pgClient.connect(function(err){
     if(err)
     loggit("error in pg connect "+err.stack);
+    else
+         loggit("connection post gres succesfull");
 });
 
 
@@ -19,7 +21,11 @@ var rdataSchema = new Schema({
 rdataSchema.index({ "mserverTime": 1 }, { expireAfterSeconds: cfg["MONGO_EXP_TIME"] });
 
 mongoose.model('rdata', rdataSchema);
-mongoose.connect('mongodb://'+cfg["MONGO_URL"],function(err){if(err){loggit("error in connecting to mongo"+err.stack)}});
+mongoose.connect('mongodb://'+cfg["MONGO_URL"],function(err){
+    if(err){
+        loggit("error in connecting to mongo"+err.stack)
+    }else { loggit (" connection to mongo succesfull")};
+});
 var Rdata = mongoose.model('rdata');
 var singleRow = new Rdata({
      });
