@@ -142,7 +142,7 @@ var bqfilepath=cfg.getFileName(deliveryinfo.queue);
 try{
      var kvmap = bqutil.formMapFromStringV2(msg,keys.keys);
      var val = bqutil.formBqCompliantLine(kvmap,columns.columns,ckmap.ckmap,ctypes)
-     messlog.info(val);
+     //messlog.info(val);  -- this is a big perf impact
      fs.appendToFile(bqfilepath,val+"\n",errHandler);
      rtd.log2RealTimeDataStore(kvmap,deliveryinfo.queue);
 
