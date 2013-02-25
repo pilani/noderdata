@@ -1,6 +1,6 @@
 var mongoose = require('mongoose'),Schema = mongoose.Schema,cfg = require('../config.js').config;
 var pg = require('pg');
-var rtd = require('../logger.js').logger.loggers.get('rtd'),kctype = require('../keyCtype.js');
+var rtd = require('../logger.js').logger.loggers.get('rtd'),kctype = require('../keyCtype.js').kctype;
 
 
 
@@ -60,6 +60,7 @@ function log2RealTimeDataStor(kvmap,queue){
      var doc = new Object() ;
      doc["mserverTime"] = new Date();
      for(var key in kvmap){
+
         if(kctype[key]=="STRING"){
          doc[key.toLowerCase()]=kvmap[key];   
         }
