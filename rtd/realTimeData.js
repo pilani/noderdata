@@ -77,7 +77,7 @@ function log2RealTimeDataStor(kvmap,queue){
     }
 }
 
-stringToBoolean: function(string){
+function  stringToBoolean(string){
     switch(string.toLowerCase()){
         case "true": return true;
         case "false": return false;
