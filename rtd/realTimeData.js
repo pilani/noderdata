@@ -1,6 +1,6 @@
 var mongoose = require('mongoose'),Schema = mongoose.Schema,cfg = require('../config.js').config;
 var pg = require('pg');
-var rtd = require('../logger.js').logger.loggers.get('rtd');
+var rtd = require('../logger.js').logger.loggers.get('rtd'),kctype = require('../keyCtype.js');
 
 
 
@@ -32,7 +32,10 @@ var singleRow = new Rdata({
 singleRow.setValue("key","value");// kind of a hack so that schema is flushed to mongo before actual insertion of data begins
 singleRow.save(function(err){loggit(err)});
 
-exports.pgQuery = function pgQuery(query,callback){
+exports.pgQuery = pgQuery;
+
+
+ function pgQuery(query,callback){
 	pgClient.query(query,function (err,result){
         if(err){
         	loggit("error in querying pg"+err.stack);
@@ -57,7 +60,14 @@ function log2RealTimeDataStor(kvmap,queue){
      var doc = new Object() ;
      doc["mserverTime"] = new Date();
      for(var key in kvmap){
-        doc[key]=kvmap[key];
+        if(kctype[key]=="STRING"){
+         doc[key.toLowerCase()]=kvmap[key];   
+        }
+        else if(kctype[key]=="NUMBER"){
+         doc[key.toLowerCase()]=Number(kvmap[key]);
+        }else if(kctype[key]=="BOOLEAN"){
+         doc[key.toLowerCase()]=stringToBoolean(kvmap[key]);
+        }
      }
      mdocs.push(doc);
      if(mdocs.length>cfg["MBS"]){
@@ -67,11 +77,19 @@ function log2RealTimeDataStor(kvmap,queue){
     }
 }
 
+stringToBoolean: function(string){
+    switch(string.toLowerCase()){
+        case "true": return true;
+        case "false": return false;
+        default: return Boolean(string);
+    }
+}
 //flush to real time storage
 function flush2Rtsd(){
     
     if(mdocs.length==0) return;
     rtdLeft++;
+
  Rdata.collection.insert(mdocs,{},function(err){
     rtdLeft--;
    if(err){
@@ -79,6 +97,7 @@ function flush2Rtsd(){
    }else{ loggit(" successfully flished to mongo "+new Date()+ "   "+ sdate) };
  });
    mdocs = [];
+
 }
 
 function loggit(mess){
@@ -101,6 +120,13 @@ exports.shutdown = function shutdown(){
 }
 
 //test();
+
+//testpg();
+
+function testpg(){
+
+pgQuery("select app_name,consumer_app_type from rdata; ",function(result){console.log(result)});
+}
 var sdate ;
 function test(){
     var obj = new Object();
