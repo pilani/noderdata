@@ -56,8 +56,13 @@ app.get('/rmqhcs', routes.rmqhcs);
 app.get('/bqPendingFiles', pendingFilesObj.bqGetListOfPendingFiles);
 app.get('/bqFailedFiles', failedFilesObj.bqGetListOfFailedFiles);
 app.get('/bqImportsHealthCheckService', obj.bqImportsHealthCheckService);
-
+app.get('/rtd',rtdQuery);
 app.listen(httpport);
+
+function rtdQuery(req,res){
+
+  rtd.pgQuery(req.query["q"],function (result){ res.send(result) });
+}
 
 /* for(var i=0;i<queues.length;i++){
   logger("trying to create new connection for "+"q: "+queues[i]);
