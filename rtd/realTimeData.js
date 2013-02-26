@@ -39,7 +39,7 @@ exports.pgQuery = pgQuery;
 	pgClient.query(query,function (err,result){
         if(err){
         	loggit("error in querying pg"+err.stack);
-        	throw err;
+        	callback("error in querying "+err);
         }
         callback(result);
 	});
