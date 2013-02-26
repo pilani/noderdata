@@ -184,8 +184,8 @@ if(err) throw err;
   }
 
 function loggerm(mess){// because during shutdown winston would still be buffering so we will use console.log
-logger.info(mess);
 console.log(mess);
+logger.info(mess);
 } 
 
 function shutdown(){
