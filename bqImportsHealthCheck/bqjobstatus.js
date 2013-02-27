@@ -34,7 +34,7 @@ executeCommand(bqcmd, function (cmdResult) {
        else
        {      
            var lines = cmdResult.split(/(\r?\n)/g);
-       
+       var resp ='Failed - No Job Found';
            for (var l=0; l<lines.length; l++) 
            {
              // Process the line, noting it might be incomplete.
@@ -53,12 +53,12 @@ executeCommand(bqcmd, function (cmdResult) {
 	    
 	        if(jobStatus == 'SUCCESS' || jobStatus == 'FAILURE')
 	        {
-                  var resp = checkJobStatus(jobId,jobType,jobStatus,lastRunTime);
-		  callback(resp);
-		  break;
+              resp = checkJobStatus(jobId,jobType,jobStatus,lastRunTime);		 
+		          break;
 	        }
-             }
+        }
 	   }
+      callback(resp);
        }
 }); 
 }
@@ -127,7 +127,7 @@ function executeCommand(cmd, callback)
    {
         if(error)
 	{	   
-	    logger.info("BQ IMPORTS HEALTH CHECKS Error communicating......."+stderr);
+	    logger.info("BQ IMPORTS HEALTH CHECKS Error communicating......."+stderr+error+stdout);
 	    callback("Error!");
         }
 	else
