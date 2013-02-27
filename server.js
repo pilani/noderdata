@@ -33,6 +33,10 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(app.router);
+
+  app.use(logErrors);
+  app.use(clientErrorHandler);
+  app.use(errorHandler);  
   
   app.use(stylus.middleware(
 		  {
@@ -42,6 +46,24 @@ app.configure(function(){
 
   app.use(express.static(__dirname + '/public'));
 });
+
+function logErrors(err, req, res, next) {
+  logger.error(" Health check Failed :"+err.stack);
+  next(err);
+}
+
+function clientErrorHandler(err, req, res, next) {
+  if (req.xhr) {
+    res.send(500, { error: 'Something blew up!' });
+  } else {
+    next(err);
+  }
+}
+
+function errorHandler(err, req, res, next) {
+  res.status(500);
+  res.render('error', { error: err });
+}
 
 
 // Routes
@@ -61,7 +83,7 @@ app.listen(httpport);
 
 function rtdQuery(req,res){
 
-  rtd.pgQuery(req.query["q"],function (result){ res.send(result) });
+  rtd.pgQuery(req.query["q"],function (result){ res.send(result);res.end(); });
 }
 
 /* for(var i=0;i<queues.length;i++){
@@ -211,7 +233,6 @@ if(filesuploader.canWeShutdown()){
 
 setTimeout(shutdown,10*1000);
 }
-
 
 
 
