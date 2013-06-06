@@ -20,14 +20,14 @@ var kvpairs = msg.split(";");
 }*/
 
 
-exports.formMapFromString = function formMapfromString(msg,keys,columns,ckmap){
+exports.formMapFromString = function formMapfromString(msg,keys){
 var iStart=0;
 var kvmap = new Object();
 var curKey,curVal,prevKey;
 var val = msg;
         for(var i=0;i<val.length;i++){
 
-                if(val[i]==':'){
+                if(val[i]==':'&& curKey==null){
                  curKey= val.substring(iStart,i);
 
 
