@@ -13,6 +13,10 @@ exports.no_bq_tasks_left_to_go = no_bq_tasks_left_to_go;
 exports.enableBqImport = enableBqImport;
 
 exports.bqImportRunner =function bqImportRunner(){
+
+if(no_bq_tasks_left_to_go< 0)
+     no_bq_tasks_left_to_go =0; // BAD- To be fixed by Pradeep.
+
   if(no_bq_tasks_left_to_go==0 && enableBqImport){   
      getBqCopyFiles(laucnBqUpload); 
   }
