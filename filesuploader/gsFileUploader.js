@@ -12,9 +12,12 @@ exports.no_gs_tasks_left_to_go = no_gs_tasks_left_to_go;
 exports.enableGsImport = enableGsImport;
 
 exports.gsuploadRunner=function gsuploadRunner(){
-  if(no_gs_tasks_left_to_go==0&&enableGsImport){   
+   if(no_gs_tasks_left_to_go< 0)
+     no_gs_tasks_left_to_go =0; // BAD- To be fixed by Pradeep.
+  
+  if(no_gs_tasks_left_to_go==0&&enableGsImport){ 
      getGSCopyFiles(laucnGsUpload); 
-  }
+   }
    setTimeout(gsuploadRunner,1000*2*60);
 }
 
