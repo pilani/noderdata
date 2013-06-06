@@ -102,7 +102,7 @@ function flush2Rtsd(){
 }
 
 function loggit(mess){
-    console.log(mess);
+    //console.log(mess);
 	rtd.log(mess);
 }
 
