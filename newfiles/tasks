@@ -1,0 +1,28 @@
+
+                                                        
+1.rotating table                                                   5/07                              
+                                  
+2.user query Tracking                                                   5/07
+
+3.7 days old data in GCS                                                12/07  
+
+4.enable realtime data to all queues-scale up for
+ all queues.currently only for seatseller using mongodb.                12/07
+
+5.load balancing for rabbitMQ -how we can run rabbit mq 
+machine under loadbalancer.                                             12/07
+                                           
+6.publish total events pushed application-wise.                         19/07
+
+7.redesign Rdata query console.UI                                        19/07
+
+8.if rabbit MQ connections reaches threshhold value trigger alert.       19/07
+
+9.track bqimport fails with reason so that we can fix the root cause.    26/07
+
+10.track data invalidation events.datatype mismatch,
+data content mismatch at node consumer level.                            26/07
+
+11.automate reimport if it fails in bq.                                  26/07
+
+
